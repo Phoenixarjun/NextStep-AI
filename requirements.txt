@@ -1,0 +1,49 @@
+# Core framework
+fastapi
+uvicorn[standard]
+
+# LangChain ecosystem
+langchain
+langgraph
+google-generativeai
+langchain-google-genai
+selenium
+tiktoken
+
+# Embeddings & Models
+transformers
+sentence-transformers
+langchainhub
+
+# Vector store (FAISS for local)
+faiss-cpu
+
+# Document loaders & parsing
+pypdf
+python-docx
+beautifulsoup4
+unstructured
+pdfminer.six
+docx2txt
+
+# NLP tools
+nltk
+spacy
+spacy-transformers
+scikit-learn
+
+# Async ops & utils
+aiohttp
+httpx
+python-dotenv
+tenacity
+pydantic
+
+# For experiments in research/
+jupyter
+notebook
+matplotlib
+pandas
+
+# Local dev install
+-e .
