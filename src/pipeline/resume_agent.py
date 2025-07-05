@@ -1,5 +1,7 @@
 from agents.resume_agent.schema import ResumeAgentInput
-from src.chains.resume_agent import build_resume_graph
+from chains.resume_agent import build_resume_graph
+from pathlib import Path
+
 
 def run_resume_agent(user_input: ResumeAgentInput) -> dict:
     graph = build_resume_graph()
@@ -8,11 +10,15 @@ def run_resume_agent(user_input: ResumeAgentInput) -> dict:
     return result
 
 if __name__ == "__main__":
+    resume_path = Path("Resume.pdf").resolve()
+    if not resume_path.exists():
+        raise FileNotFoundError(f"Resume file not found at {resume_path}")
+    
     sample_input = ResumeAgentInput(
         job_type="Full Time",
         domain="Machine Learning",
-        project_description="Built a face detection model using OpenCV and trained it on custom dataset.",
-        resume_text="Resume.pdf"
+        job_description ="Built a face detection model using OpenCV and trained it on custom dataset.",
+        resume_text=str(resume_path)
     )
 
     output = run_resume_agent(sample_input)
