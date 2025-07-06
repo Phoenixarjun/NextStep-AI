@@ -16,6 +16,9 @@ def generate_resume_suggestions(agent_input) -> str:
         "job_type": agent_input.job_type,
         "target_domain": agent_input.domain,
         "job_description": agent_input.job_description,
+        "company_name": agent_input.company_name or "",
+        "company_description": agent_input.company_description or "",
+        "role_applying_for": agent_input.role_applying_for or "",
         "email": parsed.get("email", ""),
         "phone": parsed.get("phone", ""),
         "entities": parsed.get("entities", [])

@@ -55,7 +55,6 @@ export default function HeaderSection({
             </motion.div>
           </div>
 
-          {/* Right Content - Tabs */}
           <div className="lg:w-1/2 w-full">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

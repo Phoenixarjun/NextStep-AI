@@ -3,11 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import uvicorn
 from pipeline.planner_agent import run_planner_agent
+from pipeline.resume_agent import run_resume_agent  # 🔥 import resume agent pipeline
 from agents.planner_agent.schema import FreshInput, ResumeInput
-import json
+from agents.resume_agent.schema import ResumeAgentInput  # 🔥 schema for resume agent
+from pathlib import Path
+import tempfile
+
+
+
 app = FastAPI()
 
-# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,18 +29,15 @@ async def root():
 async def generate_plan_from_form(request: Request):
     try:
         form_data = await request.form()
-        
         interests = form_data.getlist("interests")
         if isinstance(interests, str):
             interests = [interests]
-        
         input_data = FreshInput(
             coding_level=form_data["coding_level"].lower(),
             interests=interests,
             self_description=form_data["self_description"],
             week_plan=int(form_data["week_plan"])
         )
-        
         result = run_planner_agent(input_data)
         print("Generated Plan:", result)
         return {
@@ -54,7 +56,6 @@ async def generate_plan_from_resume(
     try:
         contents = await file.read()
         resume_text = contents.decode("utf-8", errors="ignore")
-
         input_data = ResumeInput(
             resume_text=resume_text,
             traits=traits,
@@ -68,6 +69,46 @@ async def generate_plan_from_resume(
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/resume")
+async def run_resume_agent_api(
+    file: UploadFile = File(...),
+    job_type: str = Form(...),
+    domain: str = Form(...),
+    job_description: str = Form(...),
+    company_name: str = Form(...),
+    company_description: str = Form(...),
+    role_applying_for: str = Form(...),
+):
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            temp_file.write(await file.read())
+            temp_path = Path(temp_file.name)
+
+
+        input_data = ResumeAgentInput(
+            resume_text=str(temp_path),  
+            job_type=job_type,
+            domain=domain,
+            job_description=job_description,
+            company_name=company_name,
+            company_description=company_description,
+            role_applying_for=role_applying_for,
+        )
+
+        result = run_resume_agent(input_data)
+
+        try:
+            temp_path.unlink()
+        except Exception as cleanup_error:
+            print(f"Warning: Could not delete temp file: {cleanup_error}")
+
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

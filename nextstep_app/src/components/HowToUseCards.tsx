@@ -1,30 +1,18 @@
 "use client";
 import { motion } from "framer-motion";
 
-const cards = [
-  {
-    title: "Upload Your Resume",
-    description: "We'll auto-analyze skills and suggest a path.",
-    icon: "📄",
-  },
-  {
-    title: "No Resume? Fill the Form",
-    description: "Tell us your strengths and interests.",
-    icon: "✍️",
-  },
-  {
-    title: "AI Agent Plans Your Career",
-    description: "Get a roadmap tailored to your goals.",
-    icon: "🧠",
-  },
-  {
-    title: "Start Learning Instantly",
-    description: "Resources, projects, and portfolio tips included.",
-    icon: "🚀",
-  },
-];
 
-export default function HowToUseCards() {
+type Card = {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+};
+
+type HowToUseCardsProps = {
+  cards: Card[];
+};
+
+export default function HowToUseCards({ cards }: HowToUseCardsProps) {
   return (
     <section className="py-12 px-4">
       <div className="container mx-auto">

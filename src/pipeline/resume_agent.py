@@ -18,6 +18,9 @@ if __name__ == "__main__":
         job_type="Full Time",
         domain="Machine Learning",
         job_description ="Built a face detection model using OpenCV and trained it on custom dataset.",
+        company_name="Tech Innovations Inc.",
+        company_description="A leading tech company specializing in AI solutions.",
+        role_applying_for="Machine Learning Engineer",
         resume_text=str(resume_path)
     )
 
