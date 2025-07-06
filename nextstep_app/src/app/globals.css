@@ -130,3 +130,34 @@ body {
   border: 2px solid var(--secondary);
   color: var(--secondary);
 }
+
+.gradient-text {
+  background: linear-gradient(to right, #00BFA6, #7F00FF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Smooth transitions for interactive elements */
+button, a {
+  transition: all 0.2s ease;
+}
+
+/* Custom scrollbar for roadmap content */
+.roadmap-content {
+  scrollbar-width: thin;
+  scrollbar-color: #4B5563 #1F2937;
+}
+
+.roadmap-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.roadmap-content::-webkit-scrollbar-track {
+  background: #1F2937;
+}
+
+.roadmap-content::-webkit-scrollbar-thumb {
+  background-color: #4B5563;
+  border-radius: 4px;
+}

@@ -23,9 +23,9 @@ const agents = [
   },
   {
     icon: <AcademicCapIcon className="w-10 h-10 text-secondary" />,
-    name: "Learning Agent",
+    name: "Planner Agent",
     description: "Creates personalized learning paths based on your career goals.",
-    route: "/learn"
+    route: "/planner"
   },
   {
     icon: <UserGroupIcon className="w-10 h-10 text-secondary" />,
@@ -64,9 +64,11 @@ const AgentCards = () => {
                 <div className="mb-4">{agent.icon}</div>
                 <h3 className="text-xl font-bold mb-2 text-white">{agent.name}</h3>
                 <p className="text-gray-400 mb-6 flex-grow">{agent.description}</p>
-                <button className="mt-auto w-full py-2 px-4 border border-secondary text-secondary rounded-lg hover:bg-secondary/10 transition-colors duration-300">
-                  Let's Try It
-                </button>
+                <a href={agent.route}>
+                  <button className="mt-auto w-full py-2 px-4 border border-secondary text-secondary rounded-lg hover:bg-secondary/10 transition-colors duration-300">
+                    Let's Try It
+                  </button>
+                </a>
               </div>
             </motion.div>
           ))}

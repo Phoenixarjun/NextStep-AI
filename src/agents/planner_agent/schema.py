@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List, Literal, Optional, Union
 
 class FreshInput(BaseModel):
-    coding_level: Literal["basic", "intermediate", "advanced"]
+    coding_level: str
     interests: List[str]
     self_description: str
     week_plan: int
