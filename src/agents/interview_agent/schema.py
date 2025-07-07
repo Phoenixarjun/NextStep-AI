@@ -1,25 +1,30 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
+from typing import List, Dict
 
-class InterviewAgentInput(BaseModel):
-    domain: str
-    job_type: str
-    experience_level: str  
-    resume_text: str
-    job_description: Optional[str] = ""
-    preferred_company: Optional[str] = ""
-    mode: Optional[str] = "text"
 
-class QuestionAnswer(BaseModel):
-    question: str
-    answer: str
-    score: Optional[int] = None
-    strengths: Optional[str] = None
-    improvements: Optional[str] = None
+class InterviewerInput(BaseModel):
+    resume_text: str 
+    job_role: Optional[str] = None  
 
-class InterviewAgentState(BaseModel):
-    input: InterviewAgentInput
-    questions: Optional[List[str]] = None
-    qa_pairs: Optional[List[QuestionAnswer]] = None
-    summary: Optional[str] = None
-    recommendations: Optional[List[str]] = None
+
+class CandidateInput(BaseModel):
+    job_type: str 
+    domain: str  
+    job_description: str
+    company_name: str
+    company_description: str
+    role_applying_for: str
+    coding_level: str 
+    duration_until_interview: str 
+    resume_text: str  
+
+
+class InterviewerState(BaseModel):
+    input: InterviewerInput
+    questions: Optional[list[str]] = None
+
+
+class CandidateState(BaseModel):
+    input: CandidateInput
+    response: Optional[str] = None

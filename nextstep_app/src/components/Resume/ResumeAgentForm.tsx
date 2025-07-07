@@ -90,7 +90,6 @@ export default function ResumeAgentForm({
       }
 
       const result = await response.json();
-      console.log("Resume analysis result:", result);
       onResults(result);
     } catch (error) {
       console.error("Error submitting resume agent form:", error);
