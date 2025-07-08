@@ -1,13 +1,19 @@
-"use client"
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { useState } from 'react'
-import Image from 'next/image'
+"use client";
 
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import Image from 'next/image';
 
 const Navbar = () => {
-  const [active, setActive] = useState('Home')
-  const links = ['Home', 'Agents', 'Docs', 'About']
+  const [active, setActive] = useState('Home');
+
+  const links = [
+    { name: 'Home', href: '/' },
+    { name: 'Interview', href: '/interview' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 bg-primary/80 backdrop-blur-md border-b border-gray-800">
@@ -26,17 +32,17 @@ const Navbar = () => {
           <div className="hidden md:flex space-x-8">
             {links.map((link) => (
               <motion.div 
-                key={link}
+                key={link.name}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Link
-                  href={`/${link.toLowerCase()}`}
-                  className={`relative px-3 py-2 ${active === link ? 'text-secondary' : 'text-gray-300 hover:text-white'}`}
-                  onClick={() => setActive(link)}
+                  href={link.href}
+                  className={`relative px-3 py-2 ${active === link.name ? 'text-secondary' : 'text-gray-300 hover:text-white'}`}
+                  onClick={() => setActive(link.name)}
                 >
-                  {link}
-                  {active === link && (
+                  {link.name}
+                  {active === link.name && (
                     <motion.span
                       layoutId="underline"
                       className="absolute left-0 top-full h-0.5 w-full bg-secondary"
@@ -56,7 +62,7 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

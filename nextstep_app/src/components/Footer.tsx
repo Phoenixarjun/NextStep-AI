@@ -1,6 +1,7 @@
 "use client"
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 const Footer = () => {
   return (
@@ -19,7 +20,13 @@ const Footer = () => {
             className="mb-6 md:mb-0"
           >
             <Link href="/" className="text-2xl font-bold">
-              <span className="gradient-text">NextStep-AI</span>
+                          <Image
+                            src="/logo.png"
+                            alt="NextStep-AI Logo"
+                            width={250}
+                            height={150}
+                            className="inline-block mr-2"
+                          />
             </Link>
           </motion.div>
           
@@ -50,7 +57,7 @@ const Footer = () => {
             viewport={{ once: true }}
             className="text-gray-500 text-sm"
           >
-            Made with 💡 by Naresh
+            &copy; {new Date().getFullYear()} NextStep-AI. All rights reserved.
           </motion.div>
         </div>
       </div>

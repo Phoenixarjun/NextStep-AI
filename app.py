@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import uvicorn
 from pipeline.planner_agent import run_planner_agent
-from pipeline.resume_agent import run_resume_agent  # 🔥 import resume agent pipeline
+from pipeline.resume_agent import run_resume_agent  
 from agents.planner_agent.schema import FreshInput, ResumeInput
-from agents.resume_agent.schema import ResumeAgentInput  # 🔥 schema for resume agent
+from agents.resume_agent.schema import ResumeAgentInput  
+from agents.interview_agent.schema import CandidateInput, InterviewerInput
+from pipeline.interview_agent import run_candidate_agent, run_interviewer_agent
 from pathlib import Path
 import tempfile
 
@@ -98,7 +100,6 @@ async def run_resume_agent_api(
         )
 
         result = run_resume_agent(input_data)
-
         try:
             temp_path.unlink()
         except Exception as cleanup_error:
@@ -109,6 +110,57 @@ async def run_resume_agent_api(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+@app.post("/api/interview")
+async def run_interview_agent_api(
+    file: UploadFile = File(...),
+    mode: str = Form(...),
+    job_type: str = Form(None),
+    domain: str = Form(None),
+    job_description: str = Form(None),
+    company_name: str = Form(None),
+    company_description: str = Form(None),
+    role_applying_for: str = Form(None),
+    coding_level: str = Form(None),
+    days_until_interview: int = Form(None),
+    job_role: str = Form(None),
+):
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            temp_file.write(await file.read())
+            temp_path = Path(temp_file.name)
+
+        if mode == "candidate":
+            input_data = CandidateInput(
+                job_type=job_type,
+                domain=domain,
+                job_description=job_description,
+                company_name=company_name,
+                company_description=company_description,
+                role_applying_for=role_applying_for,
+                coding_level=coding_level,
+                duration_until_interview=str(days_until_interview),
+                resume_text=str(temp_path),
+            )
+            result = run_candidate_agent(input_data)
+        elif mode == "interviewer":
+            input_data = InterviewerInput(
+                job_role=job_role,
+                resume_text=str(temp_path)
+            )
+            result = run_interviewer_agent(input_data)
+        else:
+            raise HTTPException(status_code=400, detail="Invalid mode")
+
+        try:
+            temp_path.unlink()
+        except Exception as cleanup_error:
+            print(f"Warning: Could not delete temp file: {cleanup_error}")
+        print("Interview Agent Result:", result)
+
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
