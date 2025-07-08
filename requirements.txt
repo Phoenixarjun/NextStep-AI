@@ -39,6 +39,7 @@ httpx
 python-dotenv
 tenacity
 pydantic
+google-search-results
 
 # For experiments in research/
 jupyter

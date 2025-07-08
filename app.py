@@ -2,12 +2,18 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import uvicorn
+
 from pipeline.planner_agent import run_planner_agent
-from pipeline.resume_agent import run_resume_agent  
+from pipeline.resume_agent import run_resume_agent 
+from pipeline.interview_agent import run_candidate_agent, run_interviewer_agent 
+from pipeline.job_agent import run_job_agent
+
+
 from agents.planner_agent.schema import FreshInput, ResumeInput
 from agents.resume_agent.schema import ResumeAgentInput  
 from agents.interview_agent.schema import CandidateInput, InterviewerInput
-from pipeline.interview_agent import run_candidate_agent, run_interviewer_agent
+from agents.job_agent.schema import JobAgentInput
+
 from pathlib import Path
 import tempfile
 
@@ -161,6 +167,55 @@ async def run_interview_agent_api(
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/job-match")
+async def job_match_agent_api(
+    file: UploadFile = File(...),
+    job_type: str = Form(...),
+    city: str = Form(...),
+    mode: str = Form(...),
+    job_role: str = Form(...),  
+):
+
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            temp_file.write(await file.read())
+            temp_path = Path(temp_file.name)
+
+        input_data = JobAgentInput(
+            job_type=job_type.strip(),
+            job_role=job_role.strip(),
+            city=city.strip(),
+            mode=mode.strip().lower(),
+            resume_path=str(temp_path)
+        )
+
+        result = run_job_agent(input_data)
+
+        try:
+            temp_path.unlink()
+        except Exception as cleanup_error:
+            print(f"Warning: Could not delete temp file: {cleanup_error}")
+
+        if "results" not in result:
+            raise HTTPException(status_code=500, detail="'results' key missing in response.")
+
+        if not result["results"]:
+            return {
+                "job_matches": [],
+                "message": "No job matches found. Try adjusting your preferences.",
+            }
+
+        return {
+            "job_matches": result["results"],
+            "message": f"Found {len(result['results'])} matching job(s)",
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
