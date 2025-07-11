@@ -11,10 +11,9 @@ from langchain.agents import Tool, initialize_agent
 from langchain_tavily import TavilySearch
 from langchain_core.runnables import RunnableMap
 
-from agents.bot_agent.prompt import qa_prompt  # PromptTemplate with JSON response
+from agents.bot_agent.prompt import qa_prompt 
 from agents.bot_agent.schema import BotInput, BotOutput
 
-# 🔁 Shared memory
 memory = ConversationBufferMemory(
     memory_key="chat_history",
     return_messages=True
@@ -22,7 +21,6 @@ memory = ConversationBufferMemory(
 
 load_dotenv()
 
-# 📥 Load FAISS vector store
 def load_vectorstore(path: str = "knowledge_index") -> FAISS:
     embedding = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
     return FAISS.load_local(
@@ -31,7 +29,6 @@ def load_vectorstore(path: str = "knowledge_index") -> FAISS:
         allow_dangerous_deserialization=True
     )
 
-# 🔐 Private document retriever tool
 def get_private_docs_tool(retriever) -> Tool:
     def search_private_docs(query: str) -> str:
         results = retriever.invoke(query)
@@ -45,7 +42,6 @@ def get_private_docs_tool(retriever) -> Tool:
         description="Search private/internal documents and resumes. Input should be a question."
     )
 
-# 🌐 Wikipedia summary tool
 def get_wikipedia_tool() -> Tool:
     wiki = WikipediaAPIWrapper()
 
@@ -63,7 +59,6 @@ def get_wikipedia_tool() -> Tool:
         description="Answer general knowledge or factual questions using Wikipedia."
     )
 
-# 🚀 Live-search-enhanced QA tool
 def get_custom_prompt_tool(llm) -> Tool:
     def prompt_fn(query: str) -> str:
         search = TavilySearch()
@@ -96,7 +91,6 @@ def get_custom_prompt_tool(llm) -> Tool:
         description="Enhanced contextual reasoning with live search and memory."
     )
 
-# 🔎 Extract JSON from markdown block
 def extract_json_from_code_block(text: str) -> dict:
     match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
     if match:
@@ -106,19 +100,16 @@ def extract_json_from_code_block(text: str) -> dict:
             pass
     return {}
 
-# 🧹 Clean response by removing markdown links and URLs
 def remove_links_from_text(text: str) -> str:
     text = re.sub(r'\[([^\]]+)\]\((https?://[^\)]+)\)', r'\1', text)
     text = re.sub(r'https?://[^\s\)]+', '', text)
     return text.strip()
 
-# 🔗 Extract all visible or hidden URLs from text
 def extract_links_from_text(text: str) -> list:
     markdown_links = re.findall(r'\[.*?\]\((https?://[^\)]+)\)', text)
     raw_links = re.findall(r'https?://[^\s\)]+', text)
     return list(set(markdown_links + raw_links))
 
-# 🧠 Chat execution logic
 def chat_with_rag(user_input: BotInput) -> BotOutput:
     try:
         llm = init_chat_model("google_genai:gemini-2.0-flash")
