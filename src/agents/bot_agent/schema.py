@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 class BotInput(BaseModel):
     query: str
@@ -9,3 +9,4 @@ class BotOutput(BaseModel):
     response: str
     resume_text: Optional[str] = None
     error: Optional[str] = None
+    sources: Optional[List[str]] = []

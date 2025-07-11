@@ -13,6 +13,7 @@ const Navbar = () => {
     { name: 'Interview', href: '/interview' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
+    { name: 'Chatbot', href: '/chatbot' },
   ];
 
   return (

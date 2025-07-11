@@ -2,20 +2,27 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import uvicorn
+import json
+import ast
+import re
 
 from pipeline.planner_agent import run_planner_agent
 from pipeline.resume_agent import run_resume_agent 
 from pipeline.interview_agent import run_candidate_agent, run_interviewer_agent 
 from pipeline.job_agent import run_job_agent
-
+from agents.bot_agent.conversation import chat_with_rag
 
 from agents.planner_agent.schema import FreshInput, ResumeInput
 from agents.resume_agent.schema import ResumeAgentInput  
 from agents.interview_agent.schema import CandidateInput, InterviewerInput
 from agents.job_agent.schema import JobAgentInput
+from agents.bot_agent.schema import BotInput
+
+
 
 from pathlib import Path
 import tempfile
+import asyncio
 
 
 
@@ -215,6 +222,43 @@ async def job_match_agent_api(
         raise HTTPException(status_code=400, detail=str(e))
 
 
+
+active_requests = {}
+@app.post("/api/chatbot")
+async def chatbot_api(file: UploadFile = File(None), query: str = Form(...)):
+    request_id = asyncio.current_task().get_name()
+    active_requests[request_id] = True
+
+    try:
+        resume_text = None
+        if file:
+            contents = await file.read()
+            resume_text = contents.decode("utf-8", errors="ignore")
+
+        user_input = BotInput(query=query.strip(), resume_text=resume_text)
+        result = chat_with_rag(user_input)
+
+        if not active_requests.get(request_id, False):
+            raise HTTPException(status_code=499, detail="Request cancelled by client")
+
+        output_content = result.response
+        sources = result.sources if hasattr(result, 'sources') else []
+
+        return {
+            "output": output_content,
+            "sources": sources
+        }
+
+    except Exception as e:
+        if str(e) != "Request cancelled by client":
+            raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        active_requests.pop(request_id, None)
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    active_requests.clear()
 
 
 if __name__ == "__main__":
