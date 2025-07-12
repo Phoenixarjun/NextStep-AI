@@ -10,6 +10,7 @@ from pipeline.planner_agent import run_planner_agent
 from pipeline.resume_agent import run_resume_agent 
 from pipeline.interview_agent import run_candidate_agent, run_interviewer_agent 
 from pipeline.job_agent import run_job_agent
+from pipeline.content_agent import run_content_agent
 from agents.bot_agent.conversation import chat_with_rag
 
 from agents.planner_agent.schema import FreshInput, ResumeInput
@@ -17,12 +18,15 @@ from agents.resume_agent.schema import ResumeAgentInput
 from agents.interview_agent.schema import CandidateInput, InterviewerInput
 from agents.job_agent.schema import JobAgentInput
 from agents.bot_agent.schema import BotInput
+from agents.content_agent.schema import ContentInput, LinkedInInput, GitHubInput, TwitterInput, OtherInput
+
 
 
 
 from pathlib import Path
 import tempfile
 import asyncio
+from pydantic import ValidationError
 
 
 
@@ -260,6 +264,47 @@ async def chatbot_api(file: UploadFile = File(None), query: str = Form(...)):
 async def shutdown_event():
     active_requests.clear()
 
+@app.post("/api/content")
+async def generate_content(request: Request):
+    try:
+        data = await request.json()
+        category = data.get("category")
+
+        # Build ContentInput dynamically based on category
+        if category == "linkedin":
+            user_input = ContentInput(
+                category=category,
+                linkedin=LinkedInInput(**data.get("linkedin", {}))
+            )
+        elif category == "github":
+            user_input = ContentInput(
+                category=category,
+                github=GitHubInput(**data.get("github", {}))
+            )
+        elif category == "twitter":
+            user_input = ContentInput(
+                category=category,
+                twitter=TwitterInput(**data.get("twitter", {}))
+            )
+        elif category == "other":
+            user_input = ContentInput(
+                category=category,
+                other=OtherInput(**data.get("other", {}))
+            )
+        else:
+            return {"error": f"Invalid category: {category}"}
+
+        result = run_content_agent(user_input)
+
+        # print("Content Agent Result:", result)
+
+        return {"generated_text": result["output"].generated_text}
+        
+
+    except ValidationError as ve:
+        return {"error": ve.errors()}
+    except Exception as e:
+        return {"error": str(e)}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

@@ -29,9 +29,9 @@ const agents = [
   },
   {
     icon: <UserGroupIcon className="w-10 h-10 text-secondary" />,
-    name: "Network Agent",
-    description: "Suggests networking opportunities and helps craft outreach messages.",
-    route: "/network"
+    name: "Content Agent",
+    description: "Generates platform-specific content for LinkedIn, GitHub, Twitter, and more.",
+    route: "/content"
   }
 ]
 
