@@ -11,6 +11,7 @@ import ContentResult from "@/components/Content/ContentResult";
 export default function ContentPage() {
   const [results, setResults] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [contentType, setContentType] = useState<"github" | "linkedin" | "twitter" | "other">("linkedin");
 
   const cards = [
     {
@@ -22,7 +23,7 @@ export default function ContentPage() {
     {
       title: "Input Your Raw Ideas",
       description:
-        "Drop in your title, description, tone, and optional links or achievements. That’s it.",
+        "Drop in your title, description, tone, and optional links or achievements. That's it.",
       icon: "📝",
     },
     {
@@ -48,6 +49,8 @@ export default function ContentPage() {
         <ContentAgentForm
           onResults={(res) => setResults(res)}
           onLoading={(loading) => setIsLoading(loading)}
+          contentType={contentType}
+          setContentType={setContentType}
         />
 
         <HowToUseCards cards={cards} />
@@ -62,7 +65,7 @@ export default function ContentPage() {
             <h2 className="gradient-text text-3xl text-center font-semibold mb-6">Generated Content</h2>
             <ContentResult
               result={results.generated_text}
-              contentType={results.category}
+              contentType={results.category || contentType}
             />
           </div>
         ) : results && results.error ? (

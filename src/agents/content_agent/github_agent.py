@@ -1,6 +1,6 @@
 import os
 import shutil
-import tempfile
+import stat
 from git import Repo
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
@@ -15,11 +15,20 @@ load_dotenv()
 llm = init_chat_model("google_genai:gemini-2.0-flash")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
+REPO_DIR = "repo"  # persistent target folder
+
+
+def on_rm_error(func, path, exc_info):
+    """Force delete files with permission issues (e.g., Windows git locks)."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
 
 def clone_repo(repo_url: str) -> str:
-    repo_path = tempfile.mkdtemp(prefix="cloned_repo_")
-    Repo.clone_from(repo_url, to_path=repo_path)
-    return repo_path
+    if os.path.exists(REPO_DIR):
+        shutil.rmtree(REPO_DIR, onerror=on_rm_error)
+    Repo.clone_from(repo_url, to_path=REPO_DIR)
+    return REPO_DIR
 
 
 def load_documents(repo_path: str):
@@ -65,5 +74,6 @@ def generate_readme(agent_input) -> str:
         })
 
         return result.content if hasattr(result, "content") else str(result)
+
     except Exception as e:
         return f"Error: {str(e)}"

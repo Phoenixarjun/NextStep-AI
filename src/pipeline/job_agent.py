@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from chains.job_agent import build_job_graph
 from agents.job_agent.schema import JobAgentInput
+import logging
 
 def run_job_agent(user_input: JobAgentInput) -> dict:
     graph = build_job_graph()
@@ -9,6 +10,9 @@ def run_job_agent(user_input: JobAgentInput) -> dict:
     return graph.invoke(state)
 
 if __name__ == "__main__":
+    STAGE_NAME = "job_agent"
+    logging.basicConfig(level=logging.INFO)
+    logging.info(f"Running {STAGE_NAME}...")
     job_type = input("Enter the job type (e.g. Software Engineer, Data Analyst): ").strip()
     city = input("Enter your city: ").strip()
     mode = input("Preferred job mode (remote/hybrid/onsite): ").strip().lower()
@@ -25,6 +29,7 @@ if __name__ == "__main__":
     )
 
     output = run_job_agent(user_input)
+    logging.info(f"Output from {STAGE_NAME}: {output}")
 
     if "results" not in output:
         raise ValueError("❌ 'results' key missing in job agent output.")
@@ -43,3 +48,4 @@ if __name__ == "__main__":
         print("-" * 80)
 
     print("\n✅ Done! Explore more opportunities or optimize your resume using the Resume Agent.\n")
+    logging.info("Job agent run complete.")

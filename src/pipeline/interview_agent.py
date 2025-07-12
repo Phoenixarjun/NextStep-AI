@@ -3,6 +3,8 @@ import re
 from pathlib import Path
 from agents.interview_agent.schema import CandidateInput, InterviewerInput
 from chains.interview_agent import build_interview_graph
+import logging
+
 
 def run_candidate_agent(user_input: CandidateInput) -> dict:
     graph = build_interview_graph()["candidate_graph"]
@@ -20,6 +22,9 @@ def extract_json_from_response(response_str: str) -> str:
     return cleaned
 
 if __name__ == "__main__":
+    STAGE_NAME = "interview_agent"
+    logging.basicConfig(level=logging.INFO)
+    logging.info(f"Running {STAGE_NAME}...")
     role = input("Are you an 'interviewer' or 'candidate'? ").strip().lower()
 
     resume_path = Path("Resume.pdf").resolve()
@@ -40,6 +45,7 @@ if __name__ == "__main__":
         )
 
         output = run_candidate_agent(sample_input)
+        logging.info(f"Output from {STAGE_NAME}: {output}")
 
         if "response" not in output:
             raise ValueError("Response key missing in state output.")
@@ -80,3 +86,5 @@ if __name__ == "__main__":
 
     else:
         print("❌ Invalid role. Please enter 'interviewer' or 'candidate'.")
+
+    logging.info("Interview agent run complete.")

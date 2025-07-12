@@ -1,5 +1,4 @@
-// types.ts
-export type Tone =
+export type Tone = 
   | "professional"
   | "friendly"
   | "motivational"
@@ -9,13 +8,15 @@ export type Tone =
   | "bold"
   | "inspiring";
 
+export type ContentTab = "linkedin" | "github" | "twitter" | "other";
+
 export interface LinkedInInput {
-  subcategory?: string;
   title: string;
   description: string;
+  tone?: Tone;
   achievements?: string[];
   link?: string;
-  tone?: Tone;
+  subcategory?: string;
 }
 
 export interface GitHubInput {
@@ -26,12 +27,12 @@ export interface GitHubInput {
 }
 
 export interface TwitterInput {
-  subcategory?: string;
   title: string;
   description: string;
   tone?: Tone;
-  link?: string;
   hashtags?: string[];
+  link?: string;
+  subcategory?: string;
 }
 
 export interface OtherInput {
@@ -41,7 +42,7 @@ export interface OtherInput {
 
 export interface ContentAgentFormProps {
   onResults: (results: any) => void;
-  onLoading: (isLoading: boolean) => void;
+  onLoading: (loading: boolean) => void;
+  contentType: ContentTab;
+  setContentType: (type: ContentTab) => void;
 }
-
-export type ContentTab = "linkedin" | "github" | "twitter" | "other";

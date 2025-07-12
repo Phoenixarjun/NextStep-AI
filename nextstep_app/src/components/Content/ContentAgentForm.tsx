@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, Check, X } from "lucide-react";
 import type {
@@ -37,15 +37,19 @@ const techStackOptions = [
   "CI/CD", "Jest", "Cypress", "Selenium"
 ];
 
-export default function ContentAgentForm({ onResults, onLoading }: ContentAgentFormProps) {
-  const [activeTab, setActiveTab] = useState<ContentTab>("linkedin");
+export default function ContentAgentForm({ 
+  onResults, 
+  onLoading,
+  contentType,
+  setContentType
+}: ContentAgentFormProps) {
+  const [activeTab, setActiveTab] = useState<ContentTab>(contentType);
   const [tempAchievement, setTempAchievement] = useState("");
   const [tempTech, setTempTech] = useState("");
   const [tempHashtag, setTempHashtag] = useState("");
   const [customTech, setCustomTech] = useState("");
   const [showCustomTech, setShowCustomTech] = useState(false);
 
-  // Form states
   const [linkedinForm, setLinkedinForm] = useState<LinkedInInput>({
     title: "",
     description: "",
@@ -70,6 +74,16 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
     custom_input: "",
     tone: "neutral",
   });
+
+  // Sync activeTab with contentType prop
+  useEffect(() => {
+    setActiveTab(contentType);
+  }, [contentType]);
+
+  const handleTabChange = (tab: ContentTab) => {
+    setActiveTab(tab);
+    setContentType(tab);
+  };
 
   const handleSubmit = async () => {
     onLoading(true);
@@ -128,14 +142,15 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
       }
 
       const result = await response.json();
-      onResults(result);
+      onResults({
+        ...result,
+        category: activeTab
+      });
     } catch (error) {
       console.error("Error:", error);
-      alert(
-        `Error generating content: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      );
+      onResults({
+        error: error instanceof Error ? error.message : String(error)
+      });
     } finally {
       onLoading(false);
     }
@@ -174,6 +189,7 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
       });
       setCustomTech("");
       setShowCustomTech(false);
+      setTempTech("");
     }
   };
 
@@ -238,11 +254,10 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
       transition={{ duration: 0.3 }}
       className="max-w-3xl mx-auto bg-white/5 backdrop-blur-sm border border-gray-700 rounded-xl overflow-hidden shadow-lg"
     >
-      {/* Custom Tabs with bottom outline */}
       <div className="flex border-b border-gray-700 relative">
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-700 z-0" />
         <button
-          onClick={() => setActiveTab("linkedin")}
+          onClick={() => handleTabChange("linkedin")}
           className={`flex-1 py-4 text-sm font-medium transition-colors relative z-10 ${
             activeTab === "linkedin"
               ? "text-indigo-300 border-b-2 border-indigo-300"
@@ -252,7 +267,7 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
           LinkedIn
         </button>
         <button
-          onClick={() => setActiveTab("github")}
+          onClick={() => handleTabChange("github")}
           className={`flex-1 py-4 text-sm font-medium transition-colors relative z-10 ${
             activeTab === "github"
               ? "text-yellow-300 border-b-2 border-yellow-300"
@@ -262,7 +277,7 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
           GitHub
         </button>
         <button
-          onClick={() => setActiveTab("twitter")}
+          onClick={() => handleTabChange("twitter")}
           className={`flex-1 py-4 text-sm font-medium transition-colors relative z-10 ${
             activeTab === "twitter"
               ? "text-blue-300 border-b-2 border-blue-300"
@@ -272,7 +287,7 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
           Twitter
         </button>
         <button
-          onClick={() => setActiveTab("other")}
+          onClick={() => handleTabChange("other")}
           className={`flex-1 py-4 text-sm font-medium transition-colors relative z-10 ${
             activeTab === "other"
               ? "text-green-300 border-b-2 border-green-300"
@@ -283,7 +298,6 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
         </button>
       </div>
 
-      {/* LinkedIn Tab */}
       {activeTab === "linkedin" && (
         <div className="p-6 space-y-6">
           <div className="space-y-2">
@@ -408,7 +422,6 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
         </div>
       )}
 
-      {/* GitHub Tab */}
       {activeTab === "github" && (
         <div className="p-6 space-y-6">
           <div className="space-y-2">
@@ -442,7 +455,6 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
             />
           </div>
 
-          {/* Tech Stack Section */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
               Tech Stack (optional)
@@ -544,7 +556,6 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
         </div>
       )}
 
-      {/* Twitter Tab */}
       {activeTab === "twitter" && (
         <div className="p-6 space-y-6">
           <div className="space-y-2">
@@ -665,7 +676,6 @@ export default function ContentAgentForm({ onResults, onLoading }: ContentAgentF
         </div>
       )}
 
-      {/* Other Tab */}
       {activeTab === "other" && (
         <div className="p-6 space-y-6">
           <div className="space-y-2">

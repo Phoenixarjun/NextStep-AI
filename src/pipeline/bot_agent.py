@@ -1,6 +1,9 @@
 from pathlib import Path
 from agents.bot_agent.schema import BotInput
 from agents.bot_agent.conversation import chat_with_rag
+import logging
+
+
 
 def run_bot_agent(user_input: BotInput) -> dict:
     output = chat_with_rag(user_input)
@@ -13,6 +16,9 @@ def run_bot_agent(user_input: BotInput) -> dict:
     }
 
 if __name__ == "__main__":
+    STAGE_NAME = "bot_agent"
+    logging.basicConfig(level=logging.INFO)
+    logging.info(f"Running {STAGE_NAME}...")
     while True:
         query = input("🤖 Ask the AI Coach anything: ").strip()
         if query == "exit":
@@ -30,6 +36,7 @@ if __name__ == "__main__":
         )
 
         output = run_bot_agent(user_input)
+        logging.info(f"Output from {STAGE_NAME}: {output}")
 
         print("\n🧠 Response:\n")
         print(output["response"] or "❌ No response generated.")
@@ -43,3 +50,4 @@ if __name__ == "__main__":
             print("\n⚠️ Error:\n", output["error"])
 
         print("\n✅ Chat complete.")
+        logging.info("Chat complete.")
