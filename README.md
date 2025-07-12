@@ -117,15 +117,13 @@ TAVILY_API_KEY=your_tavily_key
 
 ---
 
-## 🖼️ Screenshots (Insert Here)
+## 🖼️ Screenshots
 
-| Agent           | UI Preview                    |
-| --------------- | ----------------------------- |
-| Planner Agent   | 📸 planner-ui.png             |
-| Resume Agent    | 📸 resume-review\.png         |
-| Interview Agent | 📸 interview-simulation.gif   |
-| Job Match Agent | 📸 job-recommendations.png    |
-| Content Agent   | 📸 github-readme-preview\.png |
+<img width="1896" height="904" alt="Screenshot 2025-07-12 222954" src="https://github.com/user-attachments/assets/9a2a7922-df95-416b-bfdc-064f75a8cfb2" />
+
+<img width="1901" height="910" alt="Screenshot 2025-07-12 223059" src="https://github.com/user-attachments/assets/bb735ef3-6829-4244-9af3-75acf4bc607a" />
+
+
 
 ---
 
@@ -133,16 +131,15 @@ TAVILY_API_KEY=your_tavily_key
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/nextstep-ai.git
-cd nextstep-ai
+git clone https://github.com/Phoenixarjun/NextStep-AI/
+cd NextStep-AI
 
 # 2. Start Frontend (Next.js)
-cd frontend
+cd nextstep_app
 npm install
 npm run dev
 
 # 3. Start Backend (FastAPI)
-cd ../backend
 pip install -r requirements.txt
 uvicorn app:app --reload
 ```
